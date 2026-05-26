@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="livent/livent.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>
