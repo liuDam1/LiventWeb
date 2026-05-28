@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 
 export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRefresh }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const stripe = useStripe()
   const elements = useElements()
   const [loading, setLoading] = useState(false)
@@ -29,33 +29,6 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
     const toastId = toast.loading(t('processing_payment', 'Procesando pago...'))
 
     try {
-      // 1. Llamar a tu Edge Function o API para crear el PaymentIntent / Suscripción
-      // Nota: Aquí asumo que tienes un endpoint configurado en Supabase Edge Functions o similar
-      // Para este ejemplo, simularemos la lógica de éxito ya que no tengo la URL de tu backend
-      
-      const { data: { session } } = await supabase.auth.getSession()
-      
-      /* 
-      // Lógica real que usarías con tu servidor:
-      const response = await axios.post('TU_API_URL/create-payment', {
-        type,
-        eventId,
-        userId: session.user.id
-      }, {
-        headers: { Authorization: `Bearer ${session.access_token}` }
-      })
-
-      const { clientSecret } = response.data
-
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement),
-        }
-      })
-
-      if (result.error) throw result.error
-      */
-
       // Simulación de éxito para el flujo de la UI
       await new Promise(resolve => setTimeout(resolve, 2000))
 
@@ -72,6 +45,14 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
     } finally {
       setLoading(false)
     }
+  }
+
+  // Mapear el código de idioma de i18next al formato que espera Stripe
+  const getStripeLocale = () => {
+    const lang = i18n.language.split('-')[0]
+    if (lang === 'zh') return 'zh'
+    if (lang === 'en') return 'en'
+    return 'es'
   }
 
   return (
@@ -109,6 +90,7 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
             </label>
             <div className="p-4 border rounded-xl bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500 transition-all">
               <CardElement options={{
+                locale: getStripeLocale(),
                 style: {
                   base: {
                     fontSize: '16px',
