@@ -1,5 +1,5 @@
 import { useAuth } from '../context/AuthContext'
-import { User, Mail, Shield, Star, CreditCard, ShieldCheck } from 'lucide-react'
+import { User, Mail, Shield, Star, CreditCard, ShieldCheck, Heart } from 'lucide-react'
 import { useState } from 'react'
 import PaymentModal from '../components/PaymentModal'
 import { Elements } from '@stripe/react-stripe-js'
@@ -19,7 +19,7 @@ export default function Profile() {
 
   const stats = [
     { label: t('attended_events'), value: '12', icon: Star || User },
-    { label: t('favorites'), value: '5', icon: Shield || Heart },
+    { label: t('favorites'), value: '5', icon: Heart || Shield },
   ]
 
   const isPremium = profile.subscription_tier === 'premium'
@@ -71,7 +71,7 @@ export default function Profile() {
           const Icon = stat.icon
           return (
             <div key={i} className="bg-white rounded-xl shadow-sm border p-4 text-center">
-              <Icon className="mx-auto text-blue-600 mb-2" size={24} />
+              {Icon ? <Icon className="mx-auto text-blue-600 mb-2" size={24} /> : <div className="h-6 w-6 mx-auto mb-2 bg-gray-100 rounded" />}
               <p className="text-2xl font-bold">{stat.value}</p>
               <p className="text-xs text-gray-500">{stat.label}</p>
             </div>

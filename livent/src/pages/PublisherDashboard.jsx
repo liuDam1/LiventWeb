@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { Plus, Calendar, MapPin, Edit2, Trash2, TrendingUp, Zap, ShieldCheck } from 'lucide-react'
+import { Plus, Calendar, MapPin, Edit2, Trash2, TrendingUp, Zap, ShieldCheck, Star } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import PaymentModal from '../components/PaymentModal'
@@ -100,7 +100,7 @@ export default function PublisherDashboard() {
             onClick={handleCreateEvent}
             className="bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
           >
-            <Plus size={24} />
+            {Plus ? <Plus size={24} /> : <span className="text-xl px-1">+</span>}
           </button>
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function PublisherDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white rounded-2xl p-6 shadow-sm border flex items-center gap-4">
           <div className="p-4 bg-green-100 rounded-xl text-green-600">
-            <TrendingUp size={32} />
+            {TrendingUp ? <TrendingUp size={32} /> : <div className="w-8 h-8 bg-green-200" />}
           </div>
           <div>
             <p className="text-sm text-gray-500 font-medium">{t('active_events')}</p>

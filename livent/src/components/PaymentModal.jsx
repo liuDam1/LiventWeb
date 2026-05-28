@@ -65,6 +65,10 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
   // Renderizado seguro de iconos
   const IconHeader = isPremium ? ShieldCheck : Zap
 
+  // Si stripe no está listo pero el modal está abierto, mostrar cargando dentro del modal
+  // para evitar que CardElement se renderice sin contexto
+  const isReady = stripe && elements
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
@@ -72,13 +76,13 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
         <div className="p-6 border-b relative">
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1"
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
           >
-            {X ? <X size={24} /> : <span>×</span>}
+            {X ? <X size={24} /> : <span className="text-2xl">×</span>}
           </button>
           <div className="flex items-center gap-3">
             <div className={`p-3 rounded-xl ${isPremium ? 'bg-blue-100 text-blue-600' : 'bg-yellow-100 text-yellow-600'}`}>
-              {IconHeader ? <IconHeader size={28} /> : isPremium ? '★' : '⚡'}
+              {IconHeader ? <IconHeader size={28} /> : <span>{isPremium ? '★' : '⚡'}</span>}
             </div>
             <div>
               <h3 className="text-xl font-bold">{isPremium ? 'Livent Premium' : 'Event Boost'}</h3>
@@ -94,29 +98,36 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
             <span className="text-2xl font-black text-gray-900">{price}</span>
           </div>
 
-          <div className="space-y-4">
-            <label className="block text-sm font-bold text-gray-700 uppercase tracking-wider">
-              {t('card_details', 'Detalles de la tarjeta')}
-            </label>
-            <div className="p-4 border rounded-xl bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500 transition-all">
-              <CardElement options={{
-                locale: getStripeLocale(),
-                style: {
-                  base: {
-                    fontSize: '16px',
-                    color: '#1f2937',
-                    '::placeholder': { color: '#9ca3af' },
-                  },
-                },
-              }} />
+          {!isReady ? (
+            <div className="py-12 text-center space-y-3">
+              <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="text-sm text-gray-500">{t('loading', 'Cargando...')}</p>
             </div>
-            {error && (
-              <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-100">
-                {AlertCircle ? <AlertCircle size={16} /> : <span>⚠️</span>}
-                <span>{error}</span>
+          ) : (
+            <div className="space-y-4">
+              <label className="block text-sm font-bold text-gray-700 uppercase tracking-wider">
+                {t('card_details', 'Detalles de la tarjeta')}
+              </label>
+              <div className="p-4 border rounded-xl bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+                <CardElement options={{
+                  locale: getStripeLocale(),
+                  style: {
+                    base: {
+                      fontSize: '16px',
+                      color: '#1f2937',
+                      '::placeholder': { color: '#9ca3af' },
+                    },
+                  },
+                }} />
               </div>
-            )}
-          </div>
+              {error && (
+                <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-100">
+                  {AlertCircle ? <AlertCircle size={16} /> : <span>⚠️</span>}
+                  <span>{error}</span>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="text-center text-xs text-gray-400">
             {t('stripe_secure', 'Pago seguro procesado por Stripe. Al pagar aceptas nuestros términos.')}
@@ -124,7 +135,7 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
 
           <button
             type="submit"
-            disabled={!stripe || loading}
+            disabled={!isReady || loading}
             className={`w-full py-4 rounded-xl font-bold text-white shadow-lg transition-all active:scale-95 disabled:opacity-50 ${
               isPremium ? 'bg-blue-600 hover:bg-blue-700' : 'bg-yellow-500 hover:bg-yellow-600'
             }`}
