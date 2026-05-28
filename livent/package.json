@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^6.4.0",
+    "@stripe/stripe-js": "^9.7.0",
     "@supabase/supabase-js": "^2.100.0",
+    "axios": "^1.16.1",
     "i18next": "^26.3.0",
     "i18next-browser-languagedetector": "^8.2.1",
     "lucide-react": "^1.7.0",

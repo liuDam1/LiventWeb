@@ -8,14 +8,19 @@ import EventDetail from './pages/EventDetail'
 import PublisherDashboard from './pages/PublisherDashboard'
 import Layout from './components/Layout'
 
-function PrivateRoute({ children, requireAuth = false }) {
-  const { user, isGuest, loading } = useAuth()
+function PrivateRoute({ children, requireAuth = false, allowPublisher = true }) {
+  const { user, profile, isGuest, loading } = useAuth()
   
   if (loading) return null
   
   // Si la ruta requiere un usuario real y no tenemos uno
   if (requireAuth && !user) {
     return <Navigate to="/auth" />
+  }
+
+  // Restringir páginas específicas de usuario (como Favoritos) para Publishers
+  if (!allowPublisher && profile?.role === 'publisher') {
+    return <Navigate to="/" />
   }
 
   // Si tenemos un usuario o es un invitado
@@ -44,7 +49,7 @@ function App() {
           <Route 
             path="/favorites" 
             element={
-              <PrivateRoute requireAuth={true}>
+              <PrivateRoute requireAuth={true} allowPublisher={false}>
                 <Favorites />
               </PrivateRoute>
             } 

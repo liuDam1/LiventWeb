@@ -74,7 +74,23 @@ const resources = {
 
       // Favoritos
       "no_favorites": "No tienes eventos guardados aún.",
-      "explore_events": "Explorar eventos"
+      "explore_events": "Explorar eventos",
+      "publisher_no_favorites": "Los organizadores no pueden tener favoritos",
+      "publisher_no_booking": "Los organizadores no pueden reservar entradas",
+
+      // Pagos
+      "processing_payment": "Procesando pago...",
+      "payment_success": "¡Pago realizado con éxito!",
+      "monthly_sub": "Suscripción mensual",
+      "one_time": "Pago único",
+      "total_to_pay": "Total a pagar",
+      "card_details": "Detalles de la tarjeta",
+      "stripe_secure": "Pago seguro procesado por Stripe. Al pagar aceptas nuestros términos.",
+      "pay_now": "Pagar ahora",
+      "go_premium": "Hacerse Premium",
+      "boost_event": "Destacar evento",
+      "limit_reached": "Has alcanzado el límite del plan gratuito (1 evento activo)",
+      "current_plan": "Plan Actual"
     }
   },
   en: {
@@ -142,7 +158,23 @@ const resources = {
       "coming_soon": "Feature coming soon",
 
       "no_favorites": "You don't have saved events yet.",
-      "explore_events": "Explore events"
+      "explore_events": "Explore events",
+      "publisher_no_favorites": "Organizers cannot have favorites",
+      "publisher_no_booking": "Organizers cannot book tickets",
+
+      // Payments
+      "processing_payment": "Processing payment...",
+      "payment_success": "Payment successful!",
+      "monthly_sub": "Monthly subscription",
+      "one_time": "One-time payment",
+      "total_to_pay": "Total to pay",
+      "card_details": "Card details",
+      "stripe_secure": "Secure payment processed by Stripe. By paying you accept our terms.",
+      "pay_now": "Pay now",
+      "go_premium": "Go Premium",
+      "boost_event": "Boost event",
+      "limit_reached": "You have reached the free plan limit (1 active event)",
+      "current_plan": "Current Plan"
     }
   },
   zh: {
@@ -210,7 +242,23 @@ const resources = {
       "coming_soon": "功能即将推出",
 
       "no_favorites": "您还没有收藏的活动。",
-      "explore_events": "探索活动"
+      "explore_events": "探索活动",
+      "publisher_no_favorites": "组织者无法添加收藏",
+      "publisher_no_booking": "组织者无法预订门票",
+
+      // Payments
+      "processing_payment": "正在处理付款...",
+      "payment_success": "付款成功！",
+      "monthly_sub": "按月订阅",
+      "one_time": "一次性付款",
+      "total_to_pay": "应付总额",
+      "card_details": "银行卡详情",
+      "stripe_secure": "由 Stripe 处理的安全支付。支付即表示您接受我们的条款。",
+      "pay_now": "立即支付",
+      "go_premium": "成为高级会员",
+      "boost_event": "推广活动",
+      "limit_reached": "您已达到免费计划限制（1 个进行中的活动）",
+      "current_plan": "当前计划"
     }
   }
 }

@@ -11,14 +11,14 @@ export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
   
-  const [isLangMenuOpen, setIsLangLangMenuOpen] = useState(false)
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false)
   const langMenuRef = useRef(null)
 
   // Cerrar el menú de idiomas al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (langMenuRef.current && !langMenuRef.ref.current.contains(event.target)) {
-        setIsLangLangMenuOpen(false)
+      if (langMenuRef.current && !langMenuRef.current.contains(event.target)) {
+        setIsLangMenuOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -33,7 +33,7 @@ export default function Layout({ children }) {
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng)
-    setIsLangLangMenuOpen(false)
+    setIsLangMenuOpen(false)
     
     const messages = {
       es: 'Idioma cambiado a Español',
@@ -52,14 +52,24 @@ export default function Layout({ children }) {
     { code: 'zh', label: '中文', flag: '🇨🇳' }
   ]
 
+  // Definir items de navegación basados en el rol
   const navItems = [
     { icon: Home, label: t('explore'), path: '/' },
-    { icon: Heart, label: t('favorites'), path: '/favorites' },
-    { icon: User, label: t('profile'), path: '/profile' },
   ]
 
+  // Solo los usuarios normales (no publishers) e invitados tienen favoritos
+  if (profile?.role !== 'publisher') {
+    navItems.push({ icon: Heart, label: t('favorites'), path: '/favorites' })
+  }
+
+  // Panel de Publisher si el usuario es un organizador
   if (profile?.role === 'publisher') {
-    navItems.splice(2, 0, { icon: LayoutDashboard, label: t('dashboard'), path: '/dashboard' })
+    navItems.push({ icon: LayoutDashboard, label: t('dashboard'), path: '/dashboard' })
+  }
+
+  // Perfil siempre visible para usuarios logueados
+  if (user) {
+    navItems.push({ icon: User, label: t('profile'), path: '/profile' })
   }
 
   return (
@@ -72,7 +82,7 @@ export default function Layout({ children }) {
           {/* Selector de Idioma Desplegable */}
           <div className="relative" ref={langMenuRef}>
             <button 
-              onClick={() => setIsLangLangMenuOpen(!isLangMenuOpen)}
+              onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
               className="p-2 text-gray-500 hover:text-blue-600 transition-colors bg-gray-50 rounded-full flex items-center gap-1 border border-gray-100"
             >
               <Languages size={18} />
