@@ -7,24 +7,23 @@ import Favorites from './pages/Favorites'
 import EventDetail from './pages/EventDetail'
 import PublisherDashboard from './pages/PublisherDashboard'
 import Layout from './components/Layout'
-import './App.css'
 
 function PrivateRoute({ children, requireAuth = false }) {
   const { user, isGuest, loading } = useAuth()
   
   if (loading) return null
   
-  // If the route requires a real user and we don't have one
+  // Si la ruta requiere un usuario real y no tenemos uno
   if (requireAuth && !user) {
     return <Navigate to="/auth" />
   }
 
-  // If we have a user or it's a guest
+  // Si tenemos un usuario o es un invitado
   if (user || isGuest) {
     return <Layout>{children}</Layout>
   }
 
-  // Otherwise go to auth
+  // De lo contrario, ir a autenticación
   return <Navigate to="/auth" />
 }
 

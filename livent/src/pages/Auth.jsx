@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { Mail, Lock, User, Briefcase, AlertCircle, ArrowRight, Check, X, Eye, EyeOff } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true)
@@ -19,7 +20,7 @@ export default function Auth() {
   const { signIn, signUp, continueAsGuest } = useAuth()
   const navigate = useNavigate()
 
-  // Password validation criteria
+  // Criterios de validación de contraseña
   const passwordCriteria = {
     length: formData.password.length >= 8,
     number: /\d/.test(formData.password),
@@ -56,6 +57,7 @@ export default function Auth() {
           password: formData.password
         })
         if (signInError) throw signInError
+        toast.success('¡Bienvenido de nuevo!')
       } else {
         const { error: signUpError } = await signUp({
           email: formData.email,
@@ -65,11 +67,12 @@ export default function Auth() {
           role: formData.role
         })
         if (signUpError) throw signUpError
-        alert('¡Registro exitoso! Te hemos enviado un correo de confirmación.')
+        toast.success('¡Registro exitoso! Revisa tu correo.', { duration: 5000 })
       }
       navigate('/')
     } catch (err) {
       setError(mapAuthError(err))
+      toast.error(mapAuthError(err))
     } finally {
       setLoading(false)
     }

@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { Plus, Calendar, MapPin, Edit2, Trash2, TrendingUp } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { toast } from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 export default function PublisherDashboard() {
+  const { t } = useTranslation()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
@@ -25,7 +27,8 @@ export default function PublisherDashboard() {
       if (error) throw error
       setEvents(data)
     } catch (error) {
-      console.error('Error fetching my events:', error.message)
+      console.error('Error al obtener mis eventos:', error.message)
+      toast.error('Error al cargar tus eventos')
     } finally {
       setLoading(false)
     }
@@ -34,6 +37,7 @@ export default function PublisherDashboard() {
   const handleDelete = async (id) => {
     if (!confirm('¿Estás seguro de que quieres eliminar este evento?')) return
     
+    const loadingToast = toast.loading('Eliminando evento...')
     try {
       const { error } = await supabase
         .from('events')
@@ -42,23 +46,27 @@ export default function PublisherDashboard() {
 
       if (error) throw error
       setEvents(events.filter(e => e.id !== id))
+      toast.success('Evento eliminado correctamente', { id: loadingToast })
     } catch (error) {
-      alert('Error al eliminar: ' + error.message)
+      toast.error('Error al eliminar: ' + error.message, { id: loadingToast })
     }
   }
 
-  if (loading) return <div className="p-8 text-center">Cargando...</div>
+  if (loading) return <div className="p-8 text-center">{t('loading')}</div>
 
   return (
     <div className="p-4 space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Mis Eventos</h2>
-        <button className="bg-blue-600 text-white p-2 rounded-full shadow-lg">
+        <button 
+          onClick={() => toast('Función de creación próximamente', { icon: '🚀' })}
+          className="bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+        >
           <Plus size={24} />
         </button>
       </div>
 
-      {/* Stats Overview */}
+      {/* Resumen de estadísticas */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border flex items-center gap-4">
         <div className="p-4 bg-green-100 rounded-xl text-green-600">
           <TrendingUp size={32} />
@@ -69,7 +77,7 @@ export default function PublisherDashboard() {
         </div>
       </div>
 
-      {/* Events List */}
+      {/* Lista de eventos */}
       <div className="space-y-4">
         {events.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-dashed">

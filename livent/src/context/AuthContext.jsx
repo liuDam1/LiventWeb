@@ -10,13 +10,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check if user was previously a guest
+    // Comprobar si el usuario era previamente un invitado
     const savedGuest = localStorage.getItem('livent_guest') === 'true'
     if (savedGuest) {
       setIsGuest(true)
     }
 
-    // Check active sessions and sets the user
+    // Comprobar sesiones activas y establecer el usuario
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user)
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
       }
     })
 
-    // Listen for changes on auth state (sign in, sign out, etc.)
+    // Escuchar cambios en el estado de autenticación (inicio de sesión, cierre, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         setUser(session.user)
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
       if (error) throw error
       setProfile(data)
     } catch (err) {
-      console.error('Error fetching profile:', err.message)
+      console.error('Error al obtener el perfil:', err.message)
     } finally {
       setLoading(false)
     }

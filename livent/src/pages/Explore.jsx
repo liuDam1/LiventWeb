@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { Calendar, MapPin, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { EventSkeleton, FeaturedSkeleton } from '../components/Skeletons'
+import { useTranslation } from 'react-i18next'
 
 export default function Explore() {
+  const { t } = useTranslation()
   const [featuredEvents, setFeaturedEvents] = useState([])
   const [upcomingEvents, setUpcomingEvents] = useState([])
   const [loading, setLoading] = useState(true)
@@ -16,7 +19,7 @@ export default function Explore() {
     try {
       setLoading(true)
       
-      // Fetch Featured
+      // Obtener eventos destacados
       const { data: featured, error: fError } = await supabase
         .from('events')
         .select('*')
@@ -27,7 +30,7 @@ export default function Explore() {
       if (fError) throw fError
       setFeaturedEvents(featured)
 
-      // Fetch Upcoming
+      // Obtener próximos eventos
       const { data: upcoming, error: uError } = await supabase
         .from('events')
         .select('*')
@@ -38,31 +41,29 @@ export default function Explore() {
       setUpcomingEvents(upcoming)
 
     } catch (error) {
-      console.error('Error fetching events:', error.message)
+      console.error('Error al cargar eventos:', error.message)
     } finally {
-      setLoading(false)
+      // Simular un pequeño retraso para apreciar los skeletons
+      setTimeout(() => setLoading(false), 800)
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    )
   }
 
   return (
     <div className="p-4 space-y-8">
-      {/* Featured Events */}
-      {featuredEvents.length > 0 && (
-        <section>
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <Star className="text-yellow-500 fill-yellow-500" size={20} />
-            Destacados
-          </h2>
-          <div className="flex overflow-x-auto gap-4 pb-4 snap-x">
-            {featuredEvents.map(event => (
+      {/* Eventos Destacados */}
+      <section>
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Star className="text-yellow-500 fill-yellow-500" size={20} />
+          {t('featured')}
+        </h2>
+        <div className="flex overflow-x-auto gap-4 pb-4 snap-x">
+          {loading ? (
+            <>
+              <FeaturedSkeleton />
+              <FeaturedSkeleton />
+            </>
+          ) : (
+            featuredEvents.map(event => (
               <Link 
                 key={event.id} 
                 to={`/event/${event.id}`}
@@ -75,7 +76,7 @@ export default function Explore() {
                     <div className="w-full h-full flex items-center justify-center text-gray-400">Sin imagen</div>
                   )}
                   <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-bold">
-                    Destacado
+                    {t('featured')}
                   </div>
                 </div>
                 <div className="p-3">
@@ -87,46 +88,50 @@ export default function Explore() {
                   </div>
                 </div>
               </Link>
-            ))}
-          </div>
-        </section>
-      )}
+            ))
+          )}
+        </div>
+      </section>
 
-      {/* All Events */}
+      {/* Todos los eventos */}
       <section>
-        <h2 className="text-xl font-bold mb-4">Próximos Eventos</h2>
+        <h2 className="text-xl font-bold mb-4">{t('upcoming')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {upcomingEvents.map(event => (
-            <Link 
-              key={event.id} 
-              to={`/event/${event.id}`}
-              className="bg-white rounded-xl overflow-hidden shadow-sm border flex h-32"
-            >
-              <div className="w-32 bg-gray-200 shrink-0">
-                {event.poster_url ? (
-                  <img src={event.poster_url} alt={event.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">Sin imagen</div>
-                )}
-              </div>
-              <div className="p-3 flex flex-col justify-between overflow-hidden">
-                <div>
-                  <h3 className="font-bold line-clamp-1">{event.title}</h3>
-                  <p className="text-gray-600 text-sm line-clamp-1">{event.artist}</p>
+          {loading ? (
+            Array(6).fill(0).map((_, i) => <EventSkeleton key={i} />)
+          ) : (
+            upcomingEvents.map(event => (
+              <Link 
+                key={event.id} 
+                to={`/event/${event.id}`}
+                className="bg-white rounded-xl overflow-hidden shadow-sm border flex h-32"
+              >
+                <div className="w-32 bg-gray-200 shrink-0">
+                  {event.poster_url ? (
+                    <img src={event.poster_url} alt={event.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">Sin imagen</div>
+                  )}
                 </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1 text-gray-500 text-xs">
-                    <Calendar size={12} />
-                    <span>{new Date(event.starts_at).toLocaleDateString()}</span>
+                <div className="p-3 flex flex-col justify-between overflow-hidden">
+                  <div>
+                    <h3 className="font-bold line-clamp-1">{event.title}</h3>
+                    <p className="text-gray-600 text-sm line-clamp-1">{event.artist}</p>
                   </div>
-                  <div className="flex items-center gap-1 text-gray-500 text-xs">
-                    <MapPin size={12} />
-                    <span className="line-clamp-1">{event.location}</span>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1 text-gray-500 text-xs">
+                      <Calendar size={12} />
+                      <span>{new Date(event.starts_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-500 text-xs">
+                      <MapPin size={12} />
+                      <span className="line-clamp-1">{event.location}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))
+          )}
         </div>
       </section>
     </div>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { Calendar, MapPin, ArrowLeft, Heart, Share2, AlertCircle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { toast } from 'react-hot-toast'
 
 export default function EventDetail() {
   const { id } = useParams()
@@ -29,7 +30,8 @@ export default function EventDetail() {
       if (error) throw error
       setEvent(data)
     } catch (error) {
-      console.error('Error fetching event:', error.message)
+      console.error('Error al cargar el evento:', error.message)
+      toast.error('No se pudo cargar el evento')
       navigate('/')
     } finally {
       setLoading(false)
@@ -50,32 +52,40 @@ export default function EventDetail() {
   const toggleFavorite = async () => {
     if (isGuest) {
       setShowLoginPrompt(true)
+      toast('Inicia sesión para guardar favoritos', { icon: '🔑' })
       return
     }
     
     if (!user) return
     
-    if (isFavorite) {
-      await supabase
-        .from('favorites')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('event_id', id)
-    } else {
-      await supabase
-        .from('favorites')
-        .insert([{ user_id: user.id, event_id: id }])
+    try {
+      if (isFavorite) {
+        await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('event_id', id)
+        toast.success('Eliminado de favoritos')
+      } else {
+        await supabase
+          .from('favorites')
+          .insert([{ user_id: user.id, event_id: id }])
+        toast.success('Añadido a favoritos', { icon: '❤️' })
+      }
+      setIsFavorite(!isFavorite)
+    } catch (err) {
+      toast.error('Error al actualizar favoritos')
     }
-    setIsFavorite(!isFavorite)
   }
 
   const handleBooking = () => {
     if (isGuest) {
       setShowLoginPrompt(true)
+      toast('Inicia sesión para reservar', { icon: '🎟️' })
       return
     }
-    // Booking logic for real users...
-    alert('Función de reserva próximamente.')
+    // Lógica de reserva para usuarios reales...
+    toast('Función de reserva próximamente', { icon: '🎫' })
   }
 
   if (loading) return <div className="p-8 text-center">Cargando...</div>

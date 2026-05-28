@@ -17,7 +17,7 @@ export default function Profile() {
 
   return (
     <div className="p-4 space-y-6">
-      {/* Header */}
+      {/* Cabecera */}
       <div className="flex flex-col items-center text-center py-6">
         <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
           <User size={48} />
@@ -29,7 +29,7 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Info Card */}
+      {/* Tarjeta de Información */}
       <div className="bg-white rounded-xl shadow-sm border p-4 space-y-4">
         <div className="flex items-center gap-3">
           <Mail className="text-gray-400" size={20} />
@@ -47,7 +47,7 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Estadísticas */}
       <div className="grid grid-cols-2 gap-4">
         {stats.map((stat, i) => {
           const Icon = stat.icon
@@ -61,7 +61,7 @@ export default function Profile() {
         })}
       </div>
 
-      {/* Subscription CTA */}
+      {/* Llamada a la acción de suscripción */}
       {profile.subscription_tier !== 'premium' && (
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl p-6 text-white shadow-lg">
           <h3 className="text-lg font-bold mb-2">Pásate a Premium</h3>
@@ -74,7 +74,7 @@ export default function Profile() {
         </div>
       )}
 
-      {/* Sign Out */}
+      {/* Cerrar Sesión */}
       <button 
         onClick={signOut}
         className="w-full bg-white text-red-600 border border-red-200 font-bold py-3 rounded-xl hover:bg-red-50 transition-colors"
