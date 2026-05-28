@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 
 export default function EventDetail() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const { user, profile, isGuest } = useAuth()

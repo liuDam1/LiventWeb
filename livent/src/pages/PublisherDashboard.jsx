@@ -120,7 +120,7 @@ export default function PublisherDashboard() {
         {isPremium && (
           <div className="bg-blue-600 rounded-2xl p-6 shadow-lg text-white flex items-center gap-4">
             <div className="p-4 bg-white/20 rounded-xl">
-              <ShieldCheck size={32} />
+              {ShieldCheck ? <ShieldCheck size={32} /> : <span>✓</span>}
             </div>
             <div>
               <p className="text-sm text-blue-100 font-medium">{t('current_plan')}</p>
@@ -157,7 +157,7 @@ export default function PublisherDashboard() {
                       </div>
                       {event.is_featured && (
                         <div className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase flex items-center gap-1">
-                          <Zap size={10} /> {t('featured')}
+                          {Zap ? <Zap size={10} /> : <span>⚡</span>} {t('featured')}
                         </div>
                       )}
                     </div>
@@ -201,15 +201,17 @@ export default function PublisherDashboard() {
       </div>
 
       {/* Modal de Pago (Stripe) */}
-      <Elements stripe={stripePromise}>
-        <PaymentModal 
-          isOpen={isPaymentModalOpen} 
-          onClose={() => setIsPaymentModalOpen(false)}
-          type={paymentType}
-          eventId={selectedEventId}
-          onPageRefresh={fetchMyEvents}
-        />
-      </Elements>
+      {stripePromise && (
+        <Elements stripe={stripePromise}>
+          <PaymentModal 
+            isOpen={isPaymentModalOpen} 
+            onClose={() => setIsPaymentModalOpen(false)}
+            type={paymentType}
+            eventId={selectedEventId}
+            onPageRefresh={fetchMyEvents}
+          />
+        </Elements>
+      )}
 
       {/* Modal de Creación de Eventos */}
       <CreateEventModal 

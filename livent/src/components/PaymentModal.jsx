@@ -16,6 +16,7 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
   const isPremium = type === 'premium'
   const price = isPremium ? '9,99 €' : '2,99 €'
 
+  // Si no está abierto, no renderizar nada
   if (!isOpen) return null
 
   const handleSubmit = async (event) => {
@@ -49,11 +50,20 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
 
   // Mapear el código de idioma de i18next al formato que espera Stripe
   const getStripeLocale = () => {
-    const lang = i18n.language.split('-')[0]
-    if (lang === 'zh') return 'zh'
-    if (lang === 'en') return 'en'
-    return 'es'
+    try {
+      const lang = i18n.language?.split('-')[0] || 'es'
+      if (['zh', 'en', 'es', 'fr', 'de', 'it', 'ja'].includes(lang)) return lang
+      return 'es'
+    } catch (e) {
+      return 'es'
+    }
   }
+
+  // Verificar si las dependencias de Stripe están listas
+  const isStripeReady = stripe && elements
+
+  // Renderizado seguro de iconos
+  const IconHeader = isPremium ? ShieldCheck : Zap
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
@@ -64,11 +74,11 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
             onClick={onClose}
             className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1"
           >
-            <X size={24} />
+            {X ? <X size={24} /> : <span>×</span>}
           </button>
           <div className="flex items-center gap-3">
             <div className={`p-3 rounded-xl ${isPremium ? 'bg-blue-100 text-blue-600' : 'bg-yellow-100 text-yellow-600'}`}>
-              {isPremium ? <ShieldCheck size={28} /> : <Zap size={28} />}
+              {IconHeader ? <IconHeader size={28} /> : isPremium ? '★' : '⚡'}
             </div>
             <div>
               <h3 className="text-xl font-bold">{isPremium ? 'Livent Premium' : 'Event Boost'}</h3>
@@ -102,7 +112,7 @@ export default function PaymentModal({ isOpen, onClose, type, eventId, onPageRef
             </div>
             {error && (
               <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-100">
-                <AlertCircle size={16} />
+                {AlertCircle ? <AlertCircle size={16} /> : <span>⚠️</span>}
                 <span>{error}</span>
               </div>
             )}

@@ -18,8 +18,8 @@ export default function Profile() {
   )
 
   const stats = [
-    { label: t('attended_events'), value: '12', icon: Star },
-    { label: t('favorites'), value: '5', icon: Shield },
+    { label: t('attended_events'), value: '12', icon: Star || User },
+    { label: t('favorites'), value: '5', icon: Shield || Heart },
   ]
 
   const isPremium = profile.subscription_tier === 'premium'
@@ -32,7 +32,7 @@ export default function Profile() {
           <User size={48} />
           {isPremium && (
             <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-md">
-              <ShieldCheck className="text-blue-600" size={24} />
+              {ShieldCheck ? <ShieldCheck className="text-blue-600" size={24} /> : <span>✓</span>}
             </div>
           )}
         </div>
@@ -94,7 +94,11 @@ export default function Profile() {
               {t('view_plans')} (9,99 €/mes)
             </button>
           </div>
-          <ShieldCheck className="absolute -right-4 -bottom-4 text-white/10 w-32 h-32 rotate-12" />
+          {ShieldCheck ? (
+            <ShieldCheck className="absolute -right-4 -bottom-4 text-white/10 w-32 h-32 rotate-12" />
+          ) : (
+            <div className="absolute -right-4 -bottom-4 text-white/10 text-8xl rotate-12">✓</div>
+          )}
         </div>
       )}
 
@@ -107,13 +111,15 @@ export default function Profile() {
       </button>
 
       {/* Modal de Pago */}
-      <Elements stripe={stripePromise}>
-        <PaymentModal 
-          isOpen={isPaymentModalOpen} 
-          onClose={() => setIsPaymentModalOpen(false)}
-          type="premium"
-        />
-      </Elements>
+      {stripePromise && (
+        <Elements stripe={stripePromise}>
+          <PaymentModal 
+            isOpen={isPaymentModalOpen} 
+            onClose={() => setIsPaymentModalOpen(false)}
+            type="premium"
+          />
+        </Elements>
+      )}
     </div>
   )
 }
