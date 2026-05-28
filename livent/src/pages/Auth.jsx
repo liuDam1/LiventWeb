@@ -3,8 +3,10 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { Mail, Lock, User, Briefcase, AlertCircle, ArrowRight, Check, X, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 export default function Auth() {
+  const { t } = useTranslation()
   const [isLogin, setIsLogin] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -31,19 +33,19 @@ export default function Auth() {
 
   const mapAuthError = (err) => {
     const message = err.message || ''
-    if (message.includes('Invalid login credentials')) return 'Email o contraseña incorrectos. Revisa tus datos.'
-    if (message.includes('User already registered')) return 'Este correo electrónico ya está registrado. Prueba a iniciar sesión.'
-    if (message.includes('Email not confirmed')) return 'Por favor, confirma tu correo electrónico para poder entrar.'
-    if (message.includes('Password should be')) return 'La contraseña debe tener al menos 6 caracteres.'
-    if (message.includes('rate limit')) return 'Demasiados intentos. Por favor, espera un momento.'
-    return 'Ha ocurrido un error inesperado. Inténtalo de nuevo.'
+    if (message.includes('Invalid login credentials')) return t('error_invalid_credentials', 'Email o contraseña incorrectos. Revisa tus datos.')
+    if (message.includes('User already registered')) return t('error_user_exists', 'Este correo electrónico ya está registrado. Prueba a iniciar sesión.')
+    if (message.includes('Email not confirmed')) return t('error_email_unconfirmed', 'Por favor, confirma tu correo electrónico para poder entrar.')
+    if (message.includes('Password should be')) return t('error_password_short', 'La contraseña debe tener al menos 6 caracteres.')
+    if (message.includes('rate limit')) return t('error_rate_limit', 'Demasiados intentos. Por favor, espera un momento.')
+    return t('error_unexpected', 'Ha ocurrido un error inesperado. Inténtalo de nuevo.')
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     
     if (!isLogin && !isPasswordStrong) {
-      setError('La contraseña no cumple con los requisitos de seguridad.')
+      setError(t('error_weak_password', 'La contraseña no cumple con los requisitos de seguridad.'))
       return
     }
 
@@ -57,7 +59,7 @@ export default function Auth() {
           password: formData.password
         })
         if (signInError) throw signInError
-        toast.success('¡Bienvenido de nuevo!')
+        toast.success(t('welcome_back'))
       } else {
         const { error: signUpError } = await signUp({
           email: formData.email,
@@ -67,12 +69,13 @@ export default function Auth() {
           role: formData.role
         })
         if (signUpError) throw signUpError
-        toast.success('¡Registro exitoso! Revisa tu correo.', { duration: 5000 })
+        toast.success(t('register_success_check_email', '¡Registro exitoso! Revisa tu correo.'), { duration: 5000 })
       }
       navigate('/')
     } catch (err) {
-      setError(mapAuthError(err))
-      toast.error(mapAuthError(err))
+      const msg = mapAuthError(err)
+      setError(msg)
+      toast.error(msg)
     } finally {
       setLoading(false)
     }
@@ -88,7 +91,7 @@ export default function Auth() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h1 className="text-center text-4xl font-extrabold text-blue-600 mb-2">Livent</h1>
         <h2 className="text-center text-xl text-gray-600">
-          {isLogin ? 'Inicia sesión en tu cuenta' : 'Crea una cuenta nueva'}
+          {isLogin ? t('login_title') : t('register_title')}
         </h2>
       </div>
 
@@ -103,7 +106,7 @@ export default function Auth() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <label className="block text-sm font-medium text-gray-700">{t('email_label')}</label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="text-gray-400" size={18} />
@@ -122,7 +125,7 @@ export default function Auth() {
             {!isLogin && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Nombre de usuario</label>
+                  <label className="block text-sm font-medium text-gray-700">{t('username_label')}</label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <User className="text-gray-400" size={18} />
@@ -139,7 +142,7 @@ export default function Auth() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Nombre completo</label>
+                  <label className="block text-sm font-medium text-gray-700">{t('fullname_label')}</label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <User className="text-gray-400" size={18} />
@@ -156,7 +159,7 @@ export default function Auth() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Tipo de cuenta</label>
+                  <label className="block text-sm font-medium text-gray-700">{t('account_type')}</label>
                   <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Briefcase className="text-gray-400" size={18} />
@@ -166,8 +169,8 @@ export default function Auth() {
                       value={formData.role}
                       onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     >
-                      <option value="user">Usuario (Explorar eventos)</option>
-                      <option value="publisher">Publisher (Crear eventos)</option>
+                      <option value="user">{t('user_role')}</option>
+                      <option value="publisher">{t('publisher_role')}</option>
                     </select>
                   </div>
                 </div>
@@ -175,7 +178,7 @@ export default function Auth() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+              <label className="block text-sm font-medium text-gray-700">{t('password_label')}</label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="text-gray-400" size={18} />
@@ -203,19 +206,19 @@ export default function Auth() {
               
               {!isLogin && (
                 <div className="mt-3 space-y-2 bg-gray-50 p-3 rounded-md border border-gray-100">
-                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Requisitos de seguridad:</p>
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{t('password_req')}:</p>
                   <div className="grid grid-cols-1 gap-1">
                     <div className={`flex items-center gap-2 text-xs ${passwordCriteria.length ? 'text-green-600' : 'text-gray-400'}`}>
                       {passwordCriteria.length ? <Check size={12} /> : <X size={12} />}
-                      Mínimo 8 caracteres
+                      {t('min_8_char')}
                     </div>
                     <div className={`flex items-center gap-2 text-xs ${passwordCriteria.number ? 'text-green-600' : 'text-gray-400'}`}>
                       {passwordCriteria.number ? <Check size={12} /> : <X size={12} />}
-                      Al menos un número
+                      {t('at_least_num')}
                     </div>
                     <div className={`flex items-center gap-2 text-xs ${passwordCriteria.special ? 'text-green-600' : 'text-gray-400'}`}>
                       {passwordCriteria.special ? <Check size={12} /> : <X size={12} />}
-                      Al menos un carácter especial (!@#$%^&*)
+                      {t('at_least_spec')} (!@#$%^&*)
                     </div>
                   </div>
                 </div>
@@ -228,7 +231,7 @@ export default function Auth() {
                 disabled={loading || (!isLogin && !isPasswordStrong)}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
               >
-                {loading ? 'Procesando...' : isLogin ? 'Entrar' : 'Registrarse'}
+                {loading ? t('processing') : isLogin ? t('sign_in') : t('register')}
               </button>
             </div>
           </form>
@@ -241,19 +244,19 @@ export default function Auth() {
               }}
               className="text-sm text-blue-600 hover:text-blue-500 font-medium"
             >
-              {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
+              {isLogin ? t('no_account') : t('have_account')}
             </button>
             
             <div className="relative w-full">
               <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-300"></span></div>
-              <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-gray-500">O también</span></div>
+              <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-gray-500">{t('or_also')}</span></div>
             </div>
 
             <button
               onClick={handleGuestMode}
               className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors font-medium"
             >
-              Continuar como invitado <ArrowRight size={16} />
+              {t('guest_mode')} <ArrowRight size={16} />
             </button>
           </div>
         </div>
