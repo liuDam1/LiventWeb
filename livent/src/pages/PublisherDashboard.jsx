@@ -5,6 +5,7 @@ import { Plus, Calendar, MapPin, Edit2, Trash2, TrendingUp, Zap, ShieldCheck } f
 import { toast } from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import PaymentModal from '../components/PaymentModal'
+import CreateEventModal from '../components/CreateEventModal'
 import { Elements } from '@stripe/react-stripe-js'
 import stripePromise from '../lib/stripe'
 
@@ -14,6 +15,7 @@ export default function PublisherDashboard() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [paymentType, setPaymentType] = useState('premium') // 'premium' o 'boost'
   const [selectedEventId, setSelectedEventId] = useState(null)
 
@@ -48,11 +50,11 @@ export default function PublisherDashboard() {
     if (!isPremium && activeEvents >= 1) {
       setPaymentType('premium')
       setIsPaymentModalOpen(true)
-      toast.error(t('limit_reached', 'Has alcanzado el límite del plan gratuito (1 evento activo)'))
+      toast.error(t('limit_reached'))
       return
     }
 
-    toast(t('coming_soon', 'Función próximamente'), { icon: '🚀' })
+    setIsCreateModalOpen(true)
   }
 
   const handleBoost = (eventId) => {
@@ -64,7 +66,7 @@ export default function PublisherDashboard() {
   const handleDelete = async (id) => {
     if (!confirm(t('delete_confirm'))) return
     
-    const loadingToast = toast.loading(t('processing', 'Procesando...'))
+    const loadingToast = toast.loading(t('processing'))
     try {
       const { error } = await supabase
         .from('events')
@@ -91,7 +93,7 @@ export default function PublisherDashboard() {
               onClick={() => { setPaymentType('premium'); setIsPaymentModalOpen(true); }}
               className="text-xs bg-blue-100 text-blue-600 px-3 py-2 rounded-full font-bold hover:bg-blue-200 transition-colors"
             >
-              {t('go_premium', 'Hacerse Premium')}
+              {t('go_premium')}
             </button>
           )}
           <button 
@@ -121,7 +123,7 @@ export default function PublisherDashboard() {
               <ShieldCheck size={32} />
             </div>
             <div>
-              <p className="text-sm text-blue-100 font-medium">{t('current_plan', 'Plan Actual')}</p>
+              <p className="text-sm text-blue-100 font-medium">{t('current_plan')}</p>
               <p className="text-xl font-black uppercase tracking-wider">Premium</p>
             </div>
           </div>
@@ -166,7 +168,7 @@ export default function PublisherDashboard() {
                     <button 
                       onClick={() => handleBoost(event.id)}
                       className="p-2 text-yellow-500 hover:bg-yellow-50 rounded-lg transition-colors"
-                      title={t('boost_event', 'Destacar evento')}
+                      title={t('boost_event')}
                     >
                       <Zap size={20} />
                     </button>
@@ -208,6 +210,13 @@ export default function PublisherDashboard() {
           onPageRefresh={fetchMyEvents}
         />
       </Elements>
+
+      {/* Modal de Creación de Eventos */}
+      <CreateEventModal 
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={fetchMyEvents}
+      />
     </div>
   )
 }

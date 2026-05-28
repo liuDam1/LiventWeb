@@ -21,9 +21,11 @@ export default function Layout({ children }) {
         setIsLangMenuOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
+    if (isLangMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [isLangMenuOpen])
 
   const handleSignOut = async () => {
     await signOut()

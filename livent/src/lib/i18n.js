@@ -78,6 +78,19 @@ const resources = {
       "publisher_no_favorites": "Los organizadores no pueden tener favoritos",
       "publisher_no_booking": "Los organizadores no pueden reservar entradas",
 
+      // Creación de Eventos
+      "create_event_title": "Crear Nuevo Evento",
+      "event_title_label": "Título del Evento",
+      "artist_label": "Artista / Organizador",
+      "location_label": "Ubicación (Ciudad, Recinto)",
+      "description_label": "Descripción",
+      "date_label": "Fecha y Hora de Inicio",
+      "image_url_label": "URL del Poster (Imagen)",
+      "cancel": "Cancelar",
+      "publish_event": "Publicar Evento",
+      "event_created_success": "¡Evento publicado con éxito!",
+      "fill_all_fields": "Por favor, rellena los campos obligatorios",
+
       // Pagos
       "processing_payment": "Procesando pago...",
       "payment_success": "¡Pago realizado con éxito!",
@@ -162,6 +175,19 @@ const resources = {
       "publisher_no_favorites": "Organizers cannot have favorites",
       "publisher_no_booking": "Organizers cannot book tickets",
 
+      // Event Creation
+      "create_event_title": "Create New Event",
+      "event_title_label": "Event Title",
+      "artist_label": "Artist / Organizer",
+      "location_label": "Location (City, Venue)",
+      "description_label": "Description",
+      "date_label": "Start Date and Time",
+      "image_url_label": "Poster URL (Image)",
+      "cancel": "Cancel",
+      "publish_event": "Publish Event",
+      "event_created_success": "Event published successfully!",
+      "fill_all_fields": "Please fill in all required fields",
+
       // Payments
       "processing_payment": "Processing payment...",
       "payment_success": "Payment successful!",
@@ -245,6 +271,19 @@ const resources = {
       "explore_events": "探索活动",
       "publisher_no_favorites": "组织者无法添加收藏",
       "publisher_no_booking": "组织者无法预订门票",
+
+      // 活动创建
+      "create_event_title": "创建新活动",
+      "event_title_label": "活动名称",
+      "artist_label": "艺术家 / 组织者",
+      "location_label": "地点 (城市, 场馆)",
+      "description_label": "活动描述",
+      "date_label": "开始日期和时间",
+      "image_url_label": "海报 URL (图片)",
+      "cancel": "取消",
+      "publish_event": "发布活动",
+      "event_created_success": "活动发布成功！",
+      "fill_all_fields": "请填写所有必填字段",
 
       // Payments
       "processing_payment": "正在处理付款...",
