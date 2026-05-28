@@ -9,11 +9,23 @@ import PublisherDashboard from './pages/PublisherDashboard'
 import Layout from './components/Layout'
 import './App.css'
 
-function PrivateRoute({ children }) {
-  const { user, loading } = useAuth()
+function PrivateRoute({ children, requireAuth = false }) {
+  const { user, isGuest, loading } = useAuth()
   
   if (loading) return null
-  return user ? <Layout>{children}</Layout> : <Navigate to="/auth" />
+  
+  // If the route requires a real user and we don't have one
+  if (requireAuth && !user) {
+    return <Navigate to="/auth" />
+  }
+
+  // If we have a user or it's a guest
+  if (user || isGuest) {
+    return <Layout>{children}</Layout>
+  }
+
+  // Otherwise go to auth
+  return <Navigate to="/auth" />
 }
 
 function App() {
@@ -33,7 +45,7 @@ function App() {
           <Route 
             path="/favorites" 
             element={
-              <PrivateRoute>
+              <PrivateRoute requireAuth={true}>
                 <Favorites />
               </PrivateRoute>
             } 
@@ -41,7 +53,7 @@ function App() {
           <Route 
             path="/profile" 
             element={
-              <PrivateRoute>
+              <PrivateRoute requireAuth={true}>
                 <Profile />
               </PrivateRoute>
             } 
@@ -49,7 +61,7 @@ function App() {
           <Route 
             path="/dashboard" 
             element={
-              <PrivateRoute>
+              <PrivateRoute requireAuth={true}>
                 <PublisherDashboard />
               </PrivateRoute>
             } 

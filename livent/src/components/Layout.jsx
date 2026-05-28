@@ -1,9 +1,9 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Heart, User, LayoutDashboard, LogOut } from 'lucide-react'
+import { Home, Heart, User, LayoutDashboard, LogOut, LogIn } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export default function Layout({ children }) {
-  const { profile, signOut } = useAuth()
+  const { user, profile, isGuest, signOut } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -28,13 +28,23 @@ export default function Layout({ children }) {
       {/* Top Bar */}
       <header className="bg-white border-b sticky top-0 z-10 px-4 py-3 flex justify-between items-center">
         <h1 className="text-xl font-bold text-blue-600">Livent</h1>
-        <button 
-          onClick={handleSignOut}
-          className="p-2 text-gray-500 hover:text-red-500 transition-colors"
-          title="Cerrar sesión"
-        >
-          <LogOut size={20} />
-        </button>
+        {isGuest ? (
+          <Link 
+            to="/auth" 
+            className="flex items-center gap-2 text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors"
+          >
+            <LogIn size={18} />
+            <span>Iniciar Sesión</span>
+          </Link>
+        ) : (
+          <button 
+            onClick={handleSignOut}
+            className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+            title="Cerrar sesión"
+          >
+            <LogOut size={20} />
+          </button>
+        )}
       </header>
 
       {/* Main Content */}

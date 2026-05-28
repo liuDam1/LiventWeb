@@ -6,14 +6,25 @@ const AuthContext = createContext({})
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
+  const [isGuest, setIsGuest] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Check if user was previously a guest
+    const savedGuest = localStorage.getItem('livent_guest') === 'true'
+    if (savedGuest) {
+      setIsGuest(true)
+    }
+
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
       if (session?.user) {
+        setUser(session.user)
+        setIsGuest(false)
+        localStorage.removeItem('livent_guest')
         fetchProfile(session.user.id)
+      } else if (!savedGuest) {
+        setLoading(false)
       } else {
         setLoading(false)
       }
@@ -21,10 +32,13 @@ export const AuthProvider = ({ children }) => {
 
     // Listen for changes on auth state (sign in, sign out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null)
       if (session?.user) {
+        setUser(session.user)
+        setIsGuest(false)
+        localStorage.removeItem('livent_guest')
         await fetchProfile(session.user.id)
       } else {
+        setUser(null)
         setProfile(null)
         setLoading(false)
       }
@@ -74,9 +88,20 @@ export const AuthProvider = ({ children }) => {
       return { data, error }
     },
 
-    signOut: () => supabase.auth.signOut(),
+    signOut: async () => {
+      await supabase.auth.signOut()
+      setIsGuest(false)
+      localStorage.removeItem('livent_guest')
+    },
+
+    continueAsGuest: () => {
+      setIsGuest(true)
+      localStorage.setItem('livent_guest', 'true')
+    },
+
     user,
     profile,
+    isGuest,
     loading
   }
 

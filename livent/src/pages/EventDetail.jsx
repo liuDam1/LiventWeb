@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Calendar, MapPin, User, ArrowLeft, Heart, Share2 } from 'lucide-react'
+import { Calendar, MapPin, ArrowLeft, Heart, Share2, AlertCircle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export default function EventDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, isGuest } = useAuth()
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isFavorite, setIsFavorite] = useState(false)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
 
   useEffect(() => {
     fetchEvent()
@@ -47,6 +48,11 @@ export default function EventDetail() {
   }
 
   const toggleFavorite = async () => {
+    if (isGuest) {
+      setShowLoginPrompt(true)
+      return
+    }
+    
     if (!user) return
     
     if (isFavorite) {
@@ -61,6 +67,15 @@ export default function EventDetail() {
         .insert([{ user_id: user.id, event_id: id }])
     }
     setIsFavorite(!isFavorite)
+  }
+
+  const handleBooking = () => {
+    if (isGuest) {
+      setShowLoginPrompt(true)
+      return
+    }
+    // Booking logic for real users...
+    alert('Función de reserva próximamente.')
   }
 
   if (loading) return <div className="p-8 text-center">Cargando...</div>
@@ -86,7 +101,7 @@ export default function EventDetail() {
         <div className="absolute bottom-4 right-4 flex gap-2">
           <button 
             onClick={toggleFavorite}
-            className="p-3 bg-white/80 backdrop-blur rounded-full shadow-md"
+            className="p-3 bg-white/80 backdrop-blur rounded-full shadow-md transition-transform active:scale-90"
           >
             <Heart size={20} className={isFavorite ? 'text-red-500 fill-red-500' : 'text-gray-600'} />
           </button>
@@ -98,6 +113,23 @@ export default function EventDetail() {
 
       {/* Content */}
       <div className="p-6 space-y-6">
+        {showLoginPrompt && (
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-xl flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="text-blue-500" size={20} />
+              <p className="text-sm text-blue-700 font-medium">
+                Debes iniciar sesión para realizar esta acción.
+              </p>
+            </div>
+            <button 
+              onClick={() => navigate('/auth')}
+              className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg w-max font-bold hover:bg-blue-700 transition-colors"
+            >
+              Ir a Iniciar Sesión
+            </button>
+          </div>
+        )}
+
         <div>
           <h1 className="text-3xl font-bold mb-2">{event.title}</h1>
           <p className="text-xl text-blue-600 font-medium">{event.artist}</p>
@@ -141,7 +173,10 @@ export default function EventDetail() {
         </div>
 
         <div className="pt-6">
-          <button className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={handleBooking}
+            className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-colors active:scale-95"
+          >
             Reservar Entradas
           </button>
         </div>
