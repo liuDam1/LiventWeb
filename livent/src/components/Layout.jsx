@@ -1,14 +1,29 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Heart, User, LayoutDashboard, LogOut, LogIn, Languages } from 'lucide-react'
+import { Home, Heart, User, LayoutDashboard, LogOut, LogIn, Languages, ChevronDown } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-hot-toast'
+import { useState, useRef, useEffect } from 'react'
 
 export default function Layout({ children }) {
   const { t, i18n } = useTranslation()
   const { user, profile, isGuest, signOut } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+  
+  const [isLangMenuOpen, setIsLangLangMenuOpen] = useState(false)
+  const langMenuRef = useRef(null)
+
+  // Cerrar el menú de idiomas al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (langMenuRef.current && !langMenuRef.ref.current.contains(event.target)) {
+        setIsLangLangMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleSignOut = async () => {
     await signOut()
@@ -16,13 +31,26 @@ export default function Layout({ children }) {
     navigate('/auth')
   }
 
-  const toggleLanguage = () => {
-    const newLang = i18n.language.startsWith('es') ? 'en' : 'es'
-    i18n.changeLanguage(newLang)
-    toast.success(newLang === 'es' ? 'Idioma cambiado a Español' : 'Language changed to English', {
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng)
+    setIsLangLangMenuOpen(false)
+    
+    const messages = {
+      es: 'Idioma cambiado a Español',
+      en: 'Language changed to English',
+      zh: '语言已更改为中文'
+    }
+    
+    toast.success(messages[lng], {
       icon: '🌍',
     })
   }
+
+  const languages = [
+    { code: 'es', label: 'Español', flag: '🇪🇸' },
+    { code: 'en', label: 'English', flag: '🇺🇸' },
+    { code: 'zh', label: '中文', flag: '🇨🇳' }
+  ]
 
   const navItems = [
     { icon: Home, label: t('explore'), path: '/' },
@@ -30,7 +58,6 @@ export default function Layout({ children }) {
     { icon: User, label: t('profile'), path: '/profile' },
   ]
 
-  // Añadir el Panel de Publisher si el usuario es un organizador
   if (profile?.role === 'publisher') {
     navItems.splice(2, 0, { icon: LayoutDashboard, label: t('dashboard'), path: '/dashboard' })
   }
@@ -38,16 +65,38 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Barra Superior */}
-      <header className="bg-white border-b sticky top-0 z-10 px-4 py-3 flex justify-between items-center">
+      <header className="bg-white border-b sticky top-0 z-20 px-4 py-3 flex justify-between items-center">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold text-blue-600">Livent</h1>
-          <button 
-            onClick={toggleLanguage}
-            className="p-2 text-gray-500 hover:text-blue-600 transition-colors bg-gray-50 rounded-full"
-            title="Cambiar idioma"
-          >
-            <Languages size={20} />
-          </button>
+          
+          {/* Selector de Idioma Desplegable */}
+          <div className="relative" ref={langMenuRef}>
+            <button 
+              onClick={() => setIsLangLangMenuOpen(!isLangMenuOpen)}
+              className="p-2 text-gray-500 hover:text-blue-600 transition-colors bg-gray-50 rounded-full flex items-center gap-1 border border-gray-100"
+            >
+              <Languages size={18} />
+              <span className="text-[10px] font-bold uppercase">{i18n.language.split('-')[0]}</span>
+              <ChevronDown size={14} className={`transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isLangMenuOpen && (
+              <div className="absolute top-full left-0 mt-2 w-32 bg-white rounded-xl shadow-xl border border-gray-100 py-1 overflow-hidden animate-in fade-in zoom-in duration-150">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => changeLanguage(lang.code)}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${
+                      i18n.language.startsWith(lang.code) ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-600'
+                    }`}
+                  >
+                    <span>{lang.flag}</span>
+                    <span>{lang.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         
         {isGuest ? (
